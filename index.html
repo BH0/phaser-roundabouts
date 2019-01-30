@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Rondabouts</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.15.1/phaser.min.js"></script>
+    <script>
+            var config = {
+            type: Phaser.AUTO,
+            width: 800,
+            height: 600,
+            backgroundColor: '#2d2d2d',
+            parent: 'roundabouts',
+            scene: {
+                preload: preload, 
+                create: create,
+                update: update
+            }
+        };
+
+        function preload() { 
+            this.load.baseURL = "http://192.168.56.1:8080";  // node http-server 
+            this.load.crossOrigin = 'anonymous';
+            this.load.spritesheet("car", "/car.png", {frameWidth: 32, frameHeight: 19.5});  
+        }
+
+        var firstExit; 
+        var secondExit;
+        var thirdExit;  
+        var outerLane;
+        var graphics;
+        var car; 
+        var game = new Phaser.Game(config);
+        var timerEvent; 
+        var firstExitButton; // todo 
+        var secondExitButton; 
+        var thirdExitButton; // todo 
+        var exitForCar = "first";  
+        var carCompletedPath = false; 
+        var enteringSecondExit; 
+        var enteringFirstExit; 
+        function create ()
+        {
+            graphics = this.add.graphics();
+
+            
+            // may need tweaking 
+            firstExit = new Phaser.Curves.Path(10, 350); // straight on 
+            firstExit.lineTo(270, 350); // lineTo(300, 350)
+            // ellipseTo(xRadius, yRadius, startAngle, endAngle, clockwise, rotation) 
+            firstExit.ellipseTo(100, 100, 60, 340, true); 
+            firstExit.lineTo(350, 100); 
+
+            secondExit = new Phaser.Curves.Path(10, 350); // straight on 
+            secondExit.lineTo(300, 350);
+            secondExit.ellipseTo(100, 100, 180, false); 
+            secondExit.lineTo(700, 350); 
+
+            secondExit = new Phaser.Curves.Path(10, 350); // straight on 
+            secondExit.lineTo(300, 350);
+            secondExit.ellipseTo(100, 100, 180, false); 
+            secondExit.lineTo(700, 350); 
+
+            /*     
+            thirdExit = new Phaser.Curves.Path(10, 350); // straight on 
+            thirdExit.lineTo(300, 350);
+            thirdExit.ellipseTo(100, 100, 180, false); 
+            thirdExit.ellipseTo(100, 100, 200, false); 
+            thirdExit.lineTo(350, 500); 
+            */ 
+
+            this.anims.create({key: "indicate", 
+                repeat: -1, 
+                frameRate: 4, 
+                frames: this.anims.generateFrameNames("car", { 
+                    start: 1, end: 2, repeat: -1
+                }),  
+            }); 
+
+            firstExitButton = this.add.text(100, 100, 'First Exit', { fill: '#0f0' });
+            firstExitButton.setInteractive();
+
+            firstExitButton.on('pointerdown', function() { 
+                if (exitForCar == "first") { 
+                    alert("correct!"); 
+                } else { 
+                    alert("incorrect"); 
+                }
+            });
+        
+            secondExitButton = this.add.text(100, 120, 'Second Exit', { fill: '#0f0' });
+            secondExitButton.setInteractive();
+
+            secondExitButton.on('pointerdown', function() { 
+                if (exitForCar == "second") { 
+                    alert("correct!"); 
+                } else { 
+                    alert("incorrect"); 
+                }
+            }); 
+
+            enteringFirstExit = this.add.sprite(300, 350, "todo"); 
+            enteringSecondExit = this.add.sprite(300, 350, "todo"); 
+        } 
+
+
+        function update ()
+        {
+
+        if (!carCompletedPath && !car) { 
+            if (exitForCar == "first") { 
+                car = this.add.follower(firstExit, 200, 200, "car", 0); 
+                car.play("indicate"); 
+                car.startFollow({
+                    duration: 6000,
+                    repeat: -1, // repeat: -1, // infiinity 
+                    rotateToPath: true,
+                    startAt: 0.5
+                });
+                car.pathTween.setCallback('onComplete', () => pathComplete(), [])
+                carCompletedPath = false; 
+            } else if (exitForCar == "second") { 
+                car = this.add.follower(secondExit, 200, 200, "car", 0); 
+                car.play("indicate"); 
+                car.startFollow({
+                    duration: 6000,
+                    repeat: -1, // repeat: -1, // infiinity 
+                    rotateToPath: true,
+                    startAt: 0.5
+                }); 
+                carCompletedPath = false; 
+                car.pathTween.setCallback('onComplete', () => pathComplete(), [])
+            } 
+        } 
+
+        if (checkOverlap(car, enteringSecondExit)) { 
+            // alert("Too late"); 
+        }
+
+            /* 
+            graphics.clear();
+            graphics.lineStyle(2, 0xffffff, 1);
+            firstExit.draw(graphics);
+            secondExit.draw(graphics);
+            // thirdExit.draw(graphics);     
+            */
+        } 
+
+        function pathComplete() { 
+            carCompletedPath = true; 
+            car.setPath(secondExit); // not being called as expected 
+        } 
+
+
+        function checkOverlap(spriteA, spriteB) {
+            var boundsA = spriteA.getBounds(); 
+            var boundsB = spriteB.getBounds(); 
+            return Phaser.Geom.Rectangle.Intersection(boundsA, boundsB); 
+        }
+
+
+    </script> 
+</body>
+</html>
