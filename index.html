@@ -44,6 +44,8 @@
         var enteringSecondExit; 
         var enteringFirstExit; 
         var tooLate = false; 
+        var points = 0; 
+        var buttonClicked = false; // to ensure the player cannot spam the "correct" button to increase points 
         function create ()
         {
             graphics = this.add.graphics();
@@ -82,14 +84,24 @@
                 }),  
             }); 
 
+
+            var pointsText = this.add.text(100, 40, 'Points: 0', { fontSize: '32px', fill: '#0f0' });
+
             firstExitButton = this.add.text(100, 100, 'First Exit', { fill: '#0f0' });
             firstExitButton.setInteractive();
 
             firstExitButton.on('pointerdown', function() { 
                 if (!tooLate) { 
                     if (exitForCar == "first") { 
+                        if (!buttonClicked) { 
+                            points++; 
+                            buttonClicked = true; 
+                            pointsText.setText('Points: ' + points);
+                        } 
                         alert("correct!"); 
                     } else { 
+                        points--; 
+                        pointsText.setText('points: ' + points);
                         alert("incorrect"); 
                     }
                 } else { 
@@ -103,8 +115,15 @@
             secondExitButton.on('pointerdown', function() { 
                 if (!tooLate) { 
                     if (exitForCar == "second") { 
+                        if (!buttonClicked) { 
+                            points++; 
+                            buttonClicked = true; 
+                            pointsText.setText('Points: ' + points);
+                        } 
                         alert("correct!"); 
                     } else { 
+                        points--; 
+                        pointsText.setText('Points: ' + points);
                         alert("incorrect"); 
                     }
                 } else { 
@@ -150,8 +169,8 @@
             // alert("too late"); 
             enteringFirstExit = true; 
             tooLate = true; 
-        }
-
+        } 
+ 
             /* 
             graphics.clear();
             graphics.lineStyle(2, 0xffffff, 1);
@@ -159,6 +178,8 @@
             secondExit.draw(graphics);
             // thirdExit.draw(graphics);     
             */
+
+
         } 
 
         function pathComplete() { 
