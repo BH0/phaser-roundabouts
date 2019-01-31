@@ -39,7 +39,7 @@
         var firstExitButton; // todo 
         var secondExitButton; 
         var thirdExitButton; // todo 
-        var exitForCar = "first";  
+        var exitForCar = "second";  
         var carCompletedPath = false; 
         var enteringSecondExit; 
         var enteringFirstExit; 
@@ -165,10 +165,20 @@
             } 
         } 
 
-        if (car.pathTween.elapsed >= 3091) { 
-            // alert("too late"); 
-            enteringFirstExit = true; 
-            tooLate = true; 
+        if (exitForCar == "first") { 
+            if (car.pathTween.elapsed >= 3091) { 
+                // alert("too late"); 
+                enteringFirstExit = true; 
+                tooLate = true; 
+            } 
+        } 
+        // console.log(car.pathTween.elapsed); 
+        if (exitForCar == "second") { 
+            if (car.pathTween.elapsed >= 2200) { 
+                // alert("too late"); 
+                enteringSecondExit = true; 
+                tooLate = true; 
+            } 
         } 
  
             /* 
