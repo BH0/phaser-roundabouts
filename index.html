@@ -43,6 +43,7 @@
         var carCompletedPath = false; 
         var enteringSecondExit; 
         var enteringFirstExit; 
+        var tooLate = false; 
         function create ()
         {
             graphics = this.add.graphics();
@@ -85,10 +86,14 @@
             firstExitButton.setInteractive();
 
             firstExitButton.on('pointerdown', function() { 
-                if (exitForCar == "first") { 
-                    alert("correct!"); 
+                if (!tooLate) { 
+                    if (exitForCar == "first") { 
+                        alert("correct!"); 
+                    } else { 
+                        alert("incorrect"); 
+                    }
                 } else { 
-                    alert("incorrect"); 
+                    alert("you could had been correct however you were too late and may had crashed")
                 }
             });
         
@@ -96,15 +101,19 @@
             secondExitButton.setInteractive();
 
             secondExitButton.on('pointerdown', function() { 
-                if (exitForCar == "second") { 
-                    alert("correct!"); 
+                if (!tooLate) { 
+                    if (exitForCar == "second") { 
+                        alert("correct!"); 
+                    } else { 
+                        alert("incorrect"); 
+                    }
                 } else { 
-                    alert("incorrect"); 
+                    alert("you could had been correct however you were too late and may had crashed")
                 }
             }); 
 
-            enteringFirstExit = this.add.sprite(300, 350, "todo"); 
-            enteringSecondExit = this.add.sprite(300, 350, "todo"); 
+            enteringFirstExit = this.add.sprite(300, 180, "todo"); 
+            enteringSecondExit = this.add.sprite(200, 350, "todo"); 
         } 
 
 
@@ -137,8 +146,10 @@
             } 
         } 
 
-        if (checkOverlap(car, enteringSecondExit)) { 
-            // alert("Too late"); 
+        if (car.pathTween.elapsed >= 3091) { 
+            // alert("too late"); 
+            enteringFirstExit = true; 
+            tooLate = true; 
         }
 
             /* 
@@ -152,16 +163,9 @@
 
         function pathComplete() { 
             carCompletedPath = true; 
+            alert("path com[;ete"); 
             car.setPath(secondExit); // not being called as expected 
         } 
-
-
-        function checkOverlap(spriteA, spriteB) {
-            var boundsA = spriteA.getBounds(); 
-            var boundsB = spriteB.getBounds(); 
-            return Phaser.Geom.Rectangle.Intersection(boundsA, boundsB); 
-        }
-
 
     </script> 
 </body>
